@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScienceBatch — High-Performance, Offline Desktop LaTeX & Typst Editor</title>
+  
+  <meta name="description" content="ScienceBatch is an ultra-fast, 100% offline desktop alternative to cloud-based LaTeX editors. In-memory RAM compilation with Tectonic and Typst, Monaco IntelliSense, and zero disk pollution." />
+  <meta name="keywords" content="ScienceBatch, LaTeX, Typst, editor, desktop, offline, Rust, Tauri, Tectonic, Overleaf alternative, scientific writing, BibTeX, IEEEtran" />
+  <meta name="author" content="ScienceBatch Team" />
+  <meta name="theme-color" content="#060911" />
+  
+  <!-- Canonical & Social Meta Tags -->
+  <link rel="canonical" href="https://sciencebatch.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sciencebatch.com/" />
+  <meta property="og:title" content="ScienceBatch — The Ultra-Fast Offline LaTeX & Typst Editor" />
+  <meta property="og:description" content="Compile scientific papers in RAM with Tectonic & Typst in < 50ms. Zero disk clutter, 100% offline and private. Powered by Rust & Tauri v2." />
+  <meta property="og:image" content="https://sciencebatch.com/favicon.svg" />
+  
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ScienceBatch — High-Performance LaTeX & Typst Studio" />
+  <meta name="twitter:description" content="In-memory VFS compilation, Monaco IntelliSense, sub-40ms builds. 100% offline and zero disk pollution." />
+  <meta name="twitter:image" content="https://sciencebatch.com/favicon.svg" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen selection:bg-brand-emerald selection:text-dark-950">
+
+  <!-- Background Ambient Glow -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-brand-emerald/15 via-brand-cyan/10 to-transparent blur-3xl opacity-60"></div>
+    <div class="absolute top-[35%] -left-48 w-[600px] h-[600px] bg-brand-cyan/5 blur-[120px] rounded-full"></div>
+    <div class="absolute top-[65%] -right-48 w-[600px] h-[600px] bg-brand-purple/5 blur-[120px] rounded-full"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 w-full backdrop-blur-md bg-dark-950/80 border-b border-slate-800/80 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center space-x-3 group focus:outline-none">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-emerald via-brand-cyan to-blue-500 p-0.5 shadow-glow-emerald group-hover:scale-105 transition-transform">
+          <div class="w-full h-full bg-dark-900 rounded-[10px] flex items-center justify-center">
+            <svg class="w-5 h-5 text-brand-emerald" viewBox="0 0 64 64" fill="none">
+              <path d="M18 18 H46 L32 32 L46 46 H18 L24 40 H38 L28 32 L38 24 H24 Z" fill="currentColor" />
+            </svg>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="font-extrabold text-xl tracking-tight text-white font-mono">Science<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-emerald to-brand-cyan">Batch</span></span>
+          <span id="nav-version-badge" class="hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-medium rounded-full bg-slate-800 text-slate-300 border border-slate-700">v0.1.0</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center space-x-7 text-sm font-medium text-slate-300">
+        <a href="#features" data-i18n="nav.features" class="hover:text-white transition-colors">Features</a>
+        <a href="#showcase" data-i18n="nav.showcase" class="hover:text-white transition-colors">Showcase</a>
+        <a href="#comparison" data-i18n="nav.comparison" class="hover:text-white transition-colors">Comparison</a>
+        <a href="#install" data-i18n="nav.install" class="hover:text-white transition-colors">Install</a>
+        <a href="#architecture" data-i18n="nav.architecture" class="hover:text-white transition-colors">Architecture</a>
+        <a href="#faq" data-i18n="nav.faq" class="hover:text-white transition-colors">FAQ</a>
+      </nav>
+
+      <!-- Language Switcher & GitHub CTA -->
+      <div class="flex items-center space-x-3">
+        <!-- Bilingual Toggle Buttons -->
+        <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-xs font-mono font-medium">
+          <button id="lang-btn-en" type="button" class="px-2 py-1 rounded transition-all focus:outline-none" aria-label="Switch to English">EN</button>
+          <button id="lang-btn-es" type="button" class="px-2 py-1 rounded transition-all focus:outline-none" aria-label="Cambiar a Español">ES</button>
+        </div>
+
+        <!-- GitHub Star Link -->
+        <a href="https://github.com/maanfitow/ScienceBatch" target="_blank" rel="noopener noreferrer"
+           class="flex items-center space-x-2 px-3.5 py-1.5 text-xs font-medium rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 hover:text-white transition-all shadow-sm">
+          <svg class="w-4 h-4 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span class="hidden sm:inline" data-i18n="nav.github">GitHub</span>
+        </a>
+
+        <!-- Mobile Menu Hamburger -->
+        <button id="mobile-menu-btn" type="button" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none" aria-label="Toggle mobile menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-1 bg-dark-900 border-b border-slate-800">
+      <a href="#features" data-i18n="nav.features" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-white">Features</a>
+      <a href="#showcase" data-i18n="nav.showcase" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-white">Showcase</a>
+      <a href="#comparison" data-i18n="nav.comparison" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-white">Comparison</a>
+      <a href="#install" data-i18n="nav.install" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-white">Install</a>
+      <a href="#architecture" data-i18n="nav.architecture" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-white">Architecture</a>
+      <a href="#faq" data-i18n="nav.faq" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-white">FAQ</a>
+    </div>
+  </header>
+
+  <main class="relative z-10">
+    <!-- Hero Section -->
+    <section class="pt-16 pb-20 md:pt-24 md:pb-28 text-center max-w-5xl mx-auto px-4 sm:px-6">
+      <!-- Badge Pill -->
+      <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs font-mono text-slate-300 mb-8 shadow-sm">
+        <span class="flex h-2 w-2 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-emerald opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-emerald"></span>
+        </span>
+        <span data-i18n="hero.badge">High-Performance Desktop LaTeX & Typst Studio</span>
+        <span class="text-slate-600">|</span>
+        <span id="hero-version-badge" class="text-brand-cyan">v0.1.0 Pre-release</span>
+      </div>
+
+      <!-- Main Title -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight sm:leading-none">
+        <span data-i18n="hero.title_start">The Ultra-Fast,</span><br class="hidden sm:block"/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-emerald via-brand-cyan to-blue-400" data-i18n="hero.title_highlight">100% Offline</span>
+        <span data-i18n="hero.title_end">LaTeX & Typst Editor</span>
+      </h1>
+
+      <!-- Subtitle Description -->
+      <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed" data-i18n="hero.description">
+        Say goodbye to 5GB TeX Live installs and slow cloud queues. Powered by in-memory VFS compilation with Tectonic and Typst, Monaco IntelliSense, and sub-40ms builds with zero disk pollution.
+      </p>
+
+      <!-- Primary CTA & Platform Selector -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+        <!-- Dynamic Smart Download Button Group -->
+        <div class="relative inline-flex rounded-xl shadow-glow-emerald group">
+          <a id="hero-cta-btn" href="https://github.com/maanfitow/ScienceBatch" target="_blank" rel="noopener noreferrer"
+             class="inline-flex items-center space-x-3 px-7 py-3.5 rounded-l-xl bg-gradient-to-r from-brand-emerald to-emerald-600 text-dark-950 font-bold text-base hover:from-brand-emerald-light hover:to-emerald-500 transition-all focus:outline-none">
+            <svg class="w-5 h-5 text-dark-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            <span id="hero-cta-text" data-i18n="hero.cta_prerelease">View on GitHub (v0.1.0 Beta)</span>
+          </a>
+
+          <!-- Dropdown Toggle Button -->
+          <button id="platforms-dropdown-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Select package"
+                  class="px-3.5 py-3.5 rounded-r-xl bg-emerald-700 hover:bg-emerald-600 text-dark-950 border-l border-emerald-800/40 transition-colors focus:outline-none">
+            <svg class="w-4 h-4 text-dark-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="platforms-dropdown-menu" class="hidden absolute top-full mt-2 left-0 sm:left-auto right-0 w-64 bg-dark-900 border border-slate-700/80 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl">
+            <!-- Dynamically populated by releases.js -->
+          </div>
+        </div>
+
+        <!-- Secondary Source / Repo Button -->
+        <a href="#install" class="inline-flex items-center space-x-2 px-6 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-white font-medium text-base transition-all">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+          </svg>
+          <span data-i18n="hero.btn_source">Source & Quickstart</span>
+        </a>
+      </div>
+
+      <!-- Subtext Status -->
+      <p id="hero-cta-subtext" class="text-xs text-slate-500 font-mono" data-i18n="hero.cta_subtext_prerelease">
+        Releases rolling out · Clone & build locally or star repo
+      </p>
+    </section>
+
+    <!-- Key Metrics Grid -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 mb-24">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <div class="glass-panel p-5 rounded-2xl border border-slate-800 text-center hover:border-slate-700 transition-colors">
+          <div class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-emerald to-teal-400 font-mono mb-1" data-i18n="stats.ram_disk">0 Bytes</div>
+          <div class="text-xs text-slate-400 font-medium" data-i18n="stats.ram_disk_sub">All compilation in RAM VFS</div>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl border border-slate-800 text-center hover:border-slate-700 transition-colors">
+          <div class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-400 font-mono mb-1" data-i18n="stats.compile_time">&lt; 50ms</div>
+          <div class="text-xs text-slate-400 font-medium" data-i18n="stats.compile_time_sub">Typst & Tectonic native speed</div>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl border border-slate-800 text-center hover:border-slate-700 transition-colors">
+          <div class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400 font-mono mb-1" data-i18n="stats.offline">100% Offline</div>
+          <div class="text-xs text-slate-400 font-medium" data-i18n="stats.offline_sub">Zero cloud dependencies</div>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl border border-slate-800 text-center hover:border-slate-700 transition-colors">
+          <div class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-500 font-mono mb-1" data-i18n="stats.memory">&lt; 90 MB</div>
+          <div class="text-xs text-slate-400 font-medium" data-i18n="stats.memory_sub">Microscopic Tauri v2 footprint</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- App Showcase / Interactive UI Simulator (Q6=B Approved Mockup) -->
+    <section id="showcase" class="max-w-6xl mx-auto px-4 sm:px-6 mb-32">
+      <div class="text-center mb-12">
+        <span class="inline-block px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-brand-cyan mb-3" data-i18n="showcase.badge">Interface Experience</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-4" data-i18n="showcase.title">Engineered for speed, precision, and zero clutter</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-base" data-i18n="showcase.subtitle">
+          A distraction-free dual panel workspace: Contextual Monaco IntelliSense on the left, hardware-accelerated PDF viewer on the right.
+        </p>
+      </div>
+
+      <!-- App Window Mockup Frame -->
+      <div class="rounded-2xl border border-slate-750 bg-dark-900 shadow-2xl overflow-hidden glass-panel">
+        
+        <!-- Window Titlebar -->
+        <div class="bg-dark-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+            <span class="text-xs font-mono text-slate-400 ml-3 hidden sm:inline">ScienceBatch — Quantum_Neural_Paper/</span>
+          </div>
+
+          <!-- Tab Switcher (LaTeX vs Typst) -->
+          <div class="flex items-center bg-dark-900 rounded-lg p-0.5 border border-slate-800 text-xs font-mono">
+            <button data-showcase-tab="latex" type="button" class="px-3 py-1 rounded bg-slate-800 text-white border-b-2 border-brand-cyan transition-all">
+              paper.tex
+            </button>
+            <button data-showcase-tab="typst" type="button" class="px-3 py-1 rounded text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all">
+              report.typ
+            </button>
+          </div>
+
+          <!-- Shortcuts Hint -->
+          <div class="hidden sm:flex items-center space-x-2 text-[11px] font-mono text-slate-500">
+            <span>Compile:</span>
+            <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Ctrl + S</kbd>
+          </div>
+        </div>
+
+        <!-- Split Workspace Simulator -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-800 min-h-[460px]">
+          
+          <!-- Left Pane: Monaco Code Editor Simulator -->
+          <div class="p-6 bg-dark-900/90 font-mono text-xs sm:text-sm overflow-x-auto">
+            
+            <!-- LaTeX Code View -->
+            <div id="showcase-latex-view" class="space-y-1.5 text-slate-300">
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">1</span><span class="text-brand-purple">\documentclass</span>[journal]{IEEEtran}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">2</span><span class="text-brand-purple">\usepackage</span>{amsmath, amssymb, graphicx}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">3</span><span class="text-brand-purple">\usepackage</span>{microtype}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">4</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">5</span><span class="text-brand-purple">\begin</span>{document}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">6</span><span class="text-brand-cyan">\title</span>{Asynchronous VFS Compilation for Real-Time Typesetting}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">7</span><span class="text-brand-cyan">\author</span>{ScienceBatch Research Group}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">8</span><span class="text-brand-purple">\maketitle</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">9</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">10</span><span class="text-brand-purple">\begin</span>{abstract}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">11</span>We present an isolated worker subprocess architecture eliminating disk I/O...</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">12</span><span class="text-brand-purple">\end</span>{abstract}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">13</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">14</span><span class="text-brand-purple">\section</span>{In-Memory Virtual File System}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">15</span>The auxiliary state is governed by equation \eqref{eq:vfs}:</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">16</span><span class="text-brand-purple">\begin</span>{equation}\label{eq:vfs}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">17</span>&nbsp;&nbsp;\mathcal{L}_{\text{compile}} = \int_{\tau=0}^{\Delta t} \nabla_{\text{RAM}} \psi(\mathbf{x}) d\tau</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">18</span><span class="text-brand-purple">\end</span>{equation}</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">19</span>As demonstrated by \cite{vaswani2017attention}, parallel dispatch reduces latency.</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">20</span><span class="text-brand-purple">\end</span>{document}</div>
+            </div>
+
+            <!-- Typst Code View (Hidden by default) -->
+            <div id="showcase-typst-view" class="hidden space-y-1.5 text-slate-300">
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">1</span><span class="text-brand-purple">#set page</span>(paper: "a4", margin: (x: 2cm, y: 2.5cm))</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">2</span><span class="text-brand-purple">#set text</span>(font: "Libertinus Serif", size: 10.5pt)</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">3</span><span class="text-brand-purple">#set par</span>(justify: true)</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">4</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">5</span><span class="text-brand-cyan">= High-Speed Typst Native Engine</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">6</span>*Author:* ScienceBatch Team &lt;research@sciencebatch.com&gt;</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">7</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">8</span>== Introduction</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">9</span>Typst provides an ultra-fast compilation model with concise syntax:</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">10</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">11</span>$ cal(F)(omega) = integral_(-infinity)^(+infinity) f(t) e^(-i omega t) dif t $</div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">12</span></div>
+              <div class="flex"><span class="editor-line-numbers w-8 shrink-0">13</span>Compiling inside ScienceBatch achieves instant 18ms feedback cycles.</div>
+            </div>
+
+          </div>
+
+          <!-- Right Pane: Live PDF Canvas Preview Simulator -->
+          <div class="p-6 bg-slate-950 flex flex-col justify-between">
+            <div class="bg-white text-slate-900 rounded-lg p-6 shadow-md font-serif text-[11px] leading-relaxed max-w-md mx-auto w-full select-none">
+              
+              <!-- Paper Header -->
+              <div class="text-center border-b border-slate-200 pb-3 mb-3">
+                <div class="font-bold text-xs uppercase tracking-tight text-slate-900">Asynchronous VFS Compilation for Real-Time Typesetting</div>
+                <div class="text-[9px] text-slate-600 mt-0.5">ScienceBatch Research Group · IEEE Transactions on Document Engineering</div>
+              </div>
+
+              <!-- Two Column Layout Simulation -->
+              <div class="grid grid-cols-2 gap-3 text-justify text-[9px] leading-snug">
+                <div>
+                  <span class="font-bold text-[8.5px] uppercase">Abstract</span>— We present an isolated worker subprocess architecture eliminating disk I/O pollution during academic publishing.
+                  <div class="font-bold text-[8.5px] uppercase mt-2">I. Introduction</div>
+                  Modern typesetting workflows in scientific research often suffer from slow compilation cycles and disk clutter caused by auxiliary metadata files.
+                </div>
+                <div>
+                  <div class="font-bold text-[8.5px] uppercase">II. Mathematical Formulation</div>
+                  The auxiliary state is governed by equation (1):
+                  <div class="text-center my-2 font-mono text-[9px] bg-slate-50 py-1 rounded border border-slate-100">
+                    $\mathcal{L}_{\text{compile}} = \int_{0}^{\Delta t} \nabla \psi d\tau$
+                  </div>
+                  Throughput benchmarking indicates a 40x speedup compared to standard disk invocations.
+                </div>
+              </div>
+
+            </div>
+
+            <!-- PDF Controls Bar -->
+            <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 font-mono">
+              <span class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-brand-emerald"></span>
+                <span data-i18n="showcase.pdf_caption">Hardware-accelerated PDF.js Canvas</span>
+              </span>
+              <span>100% · Page 1 / 4</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Window Bottom Status Bar -->
+        <div class="bg-dark-950 px-4 py-2 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-slate-400 gap-1">
+          <div class="flex items-center space-x-2">
+            <span class="text-brand-emerald font-semibold">⚡ Tectonic &amp; Typst RAM VFS</span>
+            <span>·</span>
+            <span class="text-slate-300" data-i18n="showcase.status_perf">Time: 34ms · Auxiliary disk files: 0</span>
+          </div>
+          <div class="text-slate-500 text-[11px]">
+            Worker Subprocess: Isolated (PID 48201)
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 mb-32">
+      <div class="text-center mb-16">
+        <span class="inline-block px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-brand-emerald mb-3" data-i18n="features.badge">Why ScienceBatch?</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-4" data-i18n="features.title">Everything you need to write world-class scientific papers</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-base" data-i18n="features.subtitle">
+          Designed from the ground up to solve the real frustrations of both traditional TeX distributions and cloud-based editors.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Feature 1: In-Memory VFS -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-2xl border border-slate-800">
+          <div class="w-12 h-12 rounded-xl bg-brand-emerald/10 border border-brand-emerald/20 flex items-center justify-center text-brand-emerald mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="feature.vfs.title">In-Memory RAM Compilation</h3>
+          <p class="text-slate-400 text-sm leading-relaxed" data-i18n="feature.vfs.desc">
+            Zero `.aux`, `.log`, `.synctex`, or `.out` clutter left on your drive. Tectonic and Typst compile in an isolated RAM virtual file system, streaming binary PDF bytes straight to the viewer.
+          </p>
+        </div>
+
+        <!-- Feature 2: Polyglot Studio -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-2xl border border-slate-800">
+          <div class="w-12 h-12 rounded-xl bg-brand-cyan/10 border border-brand-cyan/20 flex items-center justify-center text-brand-cyan mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="feature.polyglot.title">Polyglot LaTeX &amp; Typst</h3>
+          <p class="text-slate-400 text-sm leading-relaxed" data-i18n="feature.polyglot.desc">
+            Seamlessly switch between XeTeX/Tectonic for LaTeX and modern Typst in the same workspace. Full support for document classes, macros, and math numbering.
+          </p>
+        </div>
+
+        <!-- Feature 3: Zero-Crash Worker -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-2xl border border-slate-800">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="feature.worker.title">Zero-Crash Worker Subprocess</h3>
+          <p class="text-slate-400 text-sm leading-relaxed" data-i18n="feature.worker.desc">
+            Compilation tasks run inside an isolated child worker (`sciencebatch --compile-worker`). TeX syntax crashes or C-level panics will never freeze or kill your editor.
+          </p>
+        </div>
+
+        <!-- Feature 4: Academic Parity -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-2xl border border-slate-800">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="feature.academic.title">Academic Document Parity</h3>
+          <p class="text-slate-400 text-sm leading-relaxed" data-i18n="feature.academic.desc">
+            Built-in offline support for IEEEtran, ACM art, Springer llncs, and CurVe CV. Full icon namespaces: FontAwesome 5, SimpleIcons, and Academicons.
+          </p>
+        </div>
+
+        <!-- Feature 5: Monaco IntelliSense -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-2xl border border-slate-800">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="feature.intellisense.title">Smart Monaco IntelliSense</h3>
+          <p class="text-slate-400 text-sm leading-relaxed" data-i18n="feature.intellisense.desc">
+            Contextual autocomplete for 120+ LaTeX commands, instant auto-scanned `\cite{` keys from `.bib` files, and dynamic `\ref{` anchors.
+          </p>
+        </div>
+
+        <!-- Feature 6: 100% Offline & Private -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-2xl border border-slate-800">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="feature.privacy.title">100% Private &amp; Autonomous</h3>
+          <p class="text-slate-400 text-sm leading-relaxed" data-i18n="feature.privacy.desc">
+            No cloud subscriptions, no downtime during conferences, and zero corporate telemetry. Your confidential manuscripts and thesis data stay strictly on your local disk.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section id="comparison" class="max-w-6xl mx-auto px-4 sm:px-6 mb-32">
+      <div class="text-center mb-16">
+        <span class="inline-block px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-brand-purple mb-3" data-i18n="comparison.badge">Feature Comparison</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-4" data-i18n="comparison.title">How ScienceBatch Compares</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-base" data-i18n="comparison.subtitle">
+          See how a lightweight Rust-powered desktop studio stacks up against the alternatives.
+        </p>
+      </div>
+
+      <div class="overflow-x-auto rounded-2xl border border-slate-800 glass-panel">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-slate-800 bg-dark-900/80 text-xs uppercase tracking-wider font-mono text-slate-300">
+              <th class="p-5" data-i18n="table.feature">Feature</th>
+              <th class="p-5 text-brand-emerald bg-brand-emerald/5 border-x border-slate-800 font-bold" data-i18n="table.sb">ScienceBatch</th>
+              <th class="p-5" data-i18n="table.overleaf">Overleaf (Cloud)</th>
+              <th class="p-5" data-i18n="table.texstudio">TeXstudio / VS Code</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 font-medium">
+            <tr>
+              <td class="p-5 text-slate-300" data-i18n="row.offline">100% Offline Capability</td>
+              <td class="p-5 bg-brand-emerald/5 border-x border-slate-800 text-brand-emerald font-semibold">✅ Yes (Zero internet needed)</td>
+              <td class="p-5 text-slate-400">❌ No (Requires browser connection)</td>
+              <td class="p-5 text-slate-400">✅ Yes</td>
+            </tr>
+            <tr>
+              <td class="p-5 text-slate-300" data-i18n="row.disk">Zero Auxiliary Disk Pollution</td>
+              <td class="p-5 bg-brand-emerald/5 border-x border-slate-800 text-brand-emerald font-semibold">✅ Yes (RAM VFS Engine)</td>
+              <td class="p-5 text-slate-400">❌ No (Stored on cloud servers)</td>
+              <td class="p-5 text-slate-400">❌ No (Fills folder with .aux/.log)</td>
+            </tr>
+            <tr>
+              <td class="p-5 text-slate-300" data-i18n="row.typst">Native Typst + LaTeX in One</td>
+              <td class="p-5 bg-brand-emerald/5 border-x border-slate-800 text-brand-emerald font-semibold">✅ Yes (Polyglot Studio)</td>
+              <td class="p-5 text-slate-400">❌ No (LaTeX only)</td>
+              <td class="p-5 text-slate-400">⚠️ Fragmented extension setup</td>
+            </tr>
+            <tr>
+              <td class="p-5 text-slate-300" data-i18n="row.ram">Lightweight RAM Usage</td>
+              <td class="p-5 bg-brand-emerald/5 border-x border-slate-800 text-brand-emerald font-semibold">🟢 &lt; 90 MB RAM</td>
+              <td class="p-5 text-slate-400">🟡 Heavy (Full browser tab)</td>
+              <td class="p-5 text-slate-400">🔴 High (VS Code / Electron: 1GB+)</td>
+            </tr>
+            <tr>
+              <td class="p-5 text-slate-300" data-i18n="row.packages">On-Demand Package Resolution</td>
+              <td class="p-5 bg-brand-emerald/5 border-x border-slate-800 text-brand-emerald font-semibold">⚡ Automatic CTAN in RAM</td>
+              <td class="p-5 text-slate-400">☁️ Cloud managed</td>
+              <td class="p-5 text-slate-400">🐢 Requires 5 GB TeX Live download</td>
+            </tr>
+            <tr>
+              <td class="p-5 text-slate-300" data-i18n="row.crash">Isolated Subprocess Worker</td>
+              <td class="p-5 bg-brand-emerald/5 border-x border-slate-800 text-brand-emerald font-semibold">🛡️ Zero-Crash Guaranteed</td>
+              <td class="p-5 text-slate-400">⚠️ Server timeout limitations</td>
+              <td class="p-5 text-slate-400">❌ Freezes GUI on infinite loop</td>
+            </tr>
+            <tr>
+              <td class="p-5 text-slate-300" data-i18n="row.cost">Cost &amp; Licensing</td>
+              <td class="p-5 bg-brand-emerald/5 border-x border-slate-800 text-brand-emerald font-semibold" data-i18n="cost.sb">Free &amp; Open Source</td>
+              <td class="p-5 text-slate-400" data-i18n="cost.overleaf">Freemium / Monthly Fee</td>
+              <td class="p-5 text-slate-400" data-i18n="cost.texstudio">Free / Manual Setup</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Installation & Quick Start -->
+    <section id="install" class="max-w-5xl mx-auto px-4 sm:px-6 mb-32">
+      <div class="text-center mb-14">
+        <span class="inline-block px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-brand-cyan mb-3" data-i18n="install.badge">Installation &amp; Setup</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-4" data-i18n="install.title">Get up and running in seconds</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-base" data-i18n="install.subtitle">
+          Available for Linux, Windows, and macOS. Grab the pre-built installer or compile directly with Cargo and Tauri.
+        </p>
+      </div>
+
+      <!-- Installation Tabs Container -->
+      <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden">
+        
+        <!-- Tab Bar -->
+        <div class="flex overflow-x-auto border-b border-slate-800 bg-dark-900/90 text-sm font-medium">
+          <button data-install-tab="linux" type="button" class="px-6 py-3.5 border-b-2 border-brand-emerald text-white bg-slate-800/80 transition-all font-mono">
+            Linux (.deb / AppImage)
+          </button>
+          <button data-install-tab="windows" type="button" class="px-6 py-3.5 border-b-2 border-transparent text-slate-400 hover:text-white transition-all font-mono">
+            Windows (.exe)
+          </button>
+          <button data-install-tab="macos" type="button" class="px-6 py-3.5 border-b-2 border-transparent text-slate-400 hover:text-white transition-all font-mono">
+            macOS (.dmg)
+          </button>
+          <button data-install-tab="source" type="button" class="px-6 py-3.5 border-b-2 border-transparent text-slate-400 hover:text-white transition-all font-mono">
+            Build from Source
+          </button>
+        </div>
+
+        <!-- Panes -->
+        <div class="p-6 sm:p-8 bg-dark-950/80">
+          
+          <!-- Linux Pane -->
+          <div data-install-pane="linux" class="space-y-6">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-mono text-slate-300 font-semibold">Debian / Ubuntu (.deb installer)</span>
+                <button data-copy-target="cmd-linux-deb" type="button" class="text-xs font-mono text-brand-emerald hover:underline flex items-center space-x-1" data-i18n="install.btn_copy">Copy</button>
+              </div>
+              <div class="bg-dark-900 border border-slate-800 rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto">
+                <code id="cmd-linux-deb">sudo dpkg -i sciencebatch-linux-amd64.deb || sudo apt-get install -f</code>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-mono text-slate-300 font-semibold">Universal Linux (AppImage)</span>
+                <button data-copy-target="cmd-linux-appimage" type="button" class="text-xs font-mono text-brand-emerald hover:underline flex items-center space-x-1" data-i18n="install.btn_copy">Copy</button>
+              </div>
+              <div class="bg-dark-900 border border-slate-800 rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto">
+                <code id="cmd-linux-appimage">chmod +x ScienceBatch-x86_64.AppImage &amp;&amp; ./ScienceBatch-x86_64.AppImage</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Windows Pane -->
+          <div data-install-pane="windows" class="hidden space-y-4">
+            <p class="text-slate-300 text-sm">Download the Windows installer package from GitHub Releases:</p>
+            <div class="bg-dark-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between">
+              <div>
+                <div class="font-mono text-sm text-white font-bold">ScienceBatch-Setup-x64.exe</div>
+                <div class="text-xs text-slate-400 mt-1">Windows 10 / 11 (64-bit) · Requires WebView2 (Built-in)</div>
+              </div>
+              <a href="https://github.com/maanfitow/ScienceBatch/releases" target="_blank" rel="noopener noreferrer"
+                 class="px-4 py-2 rounded-lg bg-brand-cyan/20 border border-brand-cyan/40 text-brand-cyan text-xs font-bold hover:bg-brand-cyan/30 transition-colors">
+                Download .exe
+              </a>
+            </div>
+          </div>
+
+          <!-- macOS Pane -->
+          <div data-install-pane="macos" class="hidden space-y-4">
+            <p class="text-slate-300 text-sm">Universal build for Apple Silicon (M1/M2/M3/M4) and Intel Macs:</p>
+            <div class="bg-dark-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between">
+              <div>
+                <div class="font-mono text-sm text-white font-bold">ScienceBatch-universal.dmg</div>
+                <div class="text-xs text-slate-400 mt-1">macOS 12 Monterey or newer</div>
+              </div>
+              <a href="https://github.com/maanfitow/ScienceBatch/releases" target="_blank" rel="noopener noreferrer"
+                 class="px-4 py-2 rounded-lg bg-brand-cyan/20 border border-brand-cyan/40 text-brand-cyan text-xs font-bold hover:bg-brand-cyan/30 transition-colors">
+                Download .dmg
+              </a>
+            </div>
+          </div>
+
+          <!-- Source Pane -->
+          <div data-install-pane="source" class="hidden space-y-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-mono text-slate-300 font-semibold">Compile from repository with Cargo &amp; Tauri v2</span>
+              <button data-copy-target="cmd-source-build" type="button" class="text-xs font-mono text-brand-emerald hover:underline flex items-center space-x-1" data-i18n="install.btn_copy">Copy</button>
+            </div>
+            <div class="bg-dark-900 border border-slate-800 rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto">
+              <pre id="cmd-source-build">git clone https://github.com/maanfitow/ScienceBatch.git
+cd ScienceBatch
+pnpm install
+cargo tauri build</pre>
+            </div>
+            <p class="text-xs text-slate-400">Requires Rust toolchain (Rust 1.75+) and Node.js v20+ with pnpm.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="max-w-6xl mx-auto px-4 sm:px-6 mb-32">
+      <div class="text-center mb-16">
+        <span class="inline-block px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-brand-emerald mb-3" data-i18n="arch.badge">System Architecture</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-4" data-i18n="arch.title">High performance through modern systems design</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-base" data-i18n="arch.subtitle">
+          Built on Rust and Tauri v2 for microscopic resource consumption and native binary execution.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+          <div class="text-xs font-mono text-brand-emerald uppercase tracking-wider mb-2">Layer 01</div>
+          <h3 class="text-lg font-bold text-white mb-2" data-i18n="arch.layer_frontend">Frontend Studio</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed" data-i18n="arch.layer_frontend_desc">
+            React 18 + Monaco Editor + PDF.js canvas running inside an ultra-lean OS Webview with minimal overhead.
+          </p>
+        </div>
+
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+          <div class="text-xs font-mono text-brand-cyan uppercase tracking-wider mb-2">Layer 02</div>
+          <h3 class="text-lg font-bold text-white mb-2" data-i18n="arch.layer_ipc">Tauri v2 IPC Gateway</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed" data-i18n="arch.layer_ipc_desc">
+            High-throughput binary streaming between the UI and backend with typed Rust commands and async progress events.
+          </p>
+        </div>
+
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+          <div class="text-xs font-mono text-brand-purple uppercase tracking-wider mb-2">Layer 03</div>
+          <h3 class="text-lg font-bold text-white mb-2" data-i18n="arch.layer_worker">Isolated Compile Worker</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed" data-i18n="arch.layer_worker_desc">
+            Subprocess running Tectonic and Typst with an in-memory VFS, ensuring GUI stability and instant zero-disk compilation.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="max-w-4xl mx-auto px-4 sm:px-6 mb-32">
+      <div class="text-center mb-16">
+        <span class="inline-block px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-brand-cyan mb-3" data-i18n="faq.badge">Frequently Asked Questions</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-4" data-i18n="faq.title">Everything you need to know</h2>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- FAQ 1 -->
+        <div data-faq-item class="glass-panel rounded-xl border border-slate-800 overflow-hidden">
+          <button data-faq-trigger type="button" aria-expanded="false" class="w-full p-5 text-left flex items-center justify-between font-semibold text-white hover:text-brand-cyan transition-colors focus:outline-none">
+            <span data-i18n="faq.q1">Do I need to download a 5 GB TeX Live distribution first?</span>
+            <svg data-faq-icon class="w-5 h-5 text-slate-400 shrink-0 ml-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div data-faq-content class="hidden px-5 pb-5 text-sm text-slate-400 leading-relaxed border-t border-slate-800/60 pt-4" data-i18n="faq.a1">
+            No! ScienceBatch eliminates the need for massive TeX Live or MacTeX installations. It uses Tectonic's on-demand package resolver that automatically fetches and caches only the exact CTAN packages your document uses, directly in RAM.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div data-faq-item class="glass-panel rounded-xl border border-slate-800 overflow-hidden">
+          <button data-faq-trigger type="button" aria-expanded="false" class="w-full p-5 text-left flex items-center justify-between font-semibold text-white hover:text-brand-cyan transition-colors focus:outline-none">
+            <span data-i18n="faq.q2">Can I open and edit my existing Overleaf or local LaTeX projects?</span>
+            <svg data-faq-icon class="w-5 h-5 text-slate-400 shrink-0 ml-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div data-faq-content class="hidden px-5 pb-5 text-sm text-slate-400 leading-relaxed border-t border-slate-800/60 pt-4" data-i18n="faq.a2">
+            Yes, absolutely. ScienceBatch has a native workspace folder scanner that automatically parses multi-file projects, subfolders (`figures/`, `sections/`), custom `.cls` / `.sty` class files, and `.bib` bibliography files.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div data-faq-item class="glass-panel rounded-xl border border-slate-800 overflow-hidden">
+          <button data-faq-trigger type="button" aria-expanded="false" class="w-full p-5 text-left flex items-center justify-between font-semibold text-white hover:text-brand-cyan transition-colors focus:outline-none">
+            <span data-i18n="faq.q3">How does in-memory RAM compilation work?</span>
+            <svg data-faq-icon class="w-5 h-5 text-slate-400 shrink-0 ml-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div data-faq-content class="hidden px-5 pb-5 text-sm text-slate-400 leading-relaxed border-t border-slate-800/60 pt-4" data-i18n="faq.a3">
+            Traditional TeX compilers write numerous temporary files (`.aux`, `.log`, `.synctex.gz`, `.bbl`, `.blg`) directly to your project folder. ScienceBatch mounts an isolated Virtual File System (VFS) in RAM during compilation and pipes the resulting PDF binary directly to the GPU canvas.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div data-faq-item class="glass-panel rounded-xl border border-slate-800 overflow-hidden">
+          <button data-faq-trigger type="button" aria-expanded="false" class="w-full p-5 text-left flex items-center justify-between font-semibold text-white hover:text-brand-cyan transition-colors focus:outline-none">
+            <span data-i18n="faq.q4">Why did you build ScienceBatch with Tauri instead of Electron?</span>
+            <svg data-faq-icon class="w-5 h-5 text-slate-400 shrink-0 ml-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div data-faq-content class="hidden px-5 pb-5 text-sm text-slate-400 leading-relaxed border-t border-slate-800/60 pt-4" data-i18n="faq.a4">
+            Electron bundles a full Chromium browser and Node.js runtime with each app, often consuming 1.5 GB to 2 GB of RAM. Tauri v2 leverages your operating system's native webview and high-performance Rust, resulting in an app that uses less than 90 MB of RAM.
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div data-faq-item class="glass-panel rounded-xl border border-slate-800 overflow-hidden">
+          <button data-faq-trigger type="button" aria-expanded="false" class="w-full p-5 text-left flex items-center justify-between font-semibold text-white hover:text-brand-cyan transition-colors focus:outline-none">
+            <span data-i18n="faq.q5">Is ScienceBatch really free and open source?</span>
+            <svg data-faq-icon class="w-5 h-5 text-slate-400 shrink-0 ml-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div data-faq-content class="hidden px-5 pb-5 text-sm text-slate-400 leading-relaxed border-t border-slate-800/60 pt-4" data-i18n="faq.a5">
+            Yes, ScienceBatch is released under the permissive Apache 2.0 License. You can inspect the code, compile it from source, contribute, and use it freely for personal, academic, or commercial research.
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-dark-950 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div class="md:col-span-2 space-y-4">
+          <div class="flex items-center space-x-2">
+            <span class="font-extrabold text-lg text-white font-mono">Science<span class="text-brand-emerald">Batch</span></span>
+          </div>
+          <p class="text-xs text-slate-400 max-w-sm leading-relaxed" data-i18n="footer.desc">
+            Ultra-fast, 100% offline desktop alternative for LaTeX and Typst typesetting. Zero disk pollution, pure performance.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold mb-3" data-i18n="footer.links_title">Project</h4>
+          <ul class="space-y-2 text-xs text-slate-400 font-medium">
+            <li><a href="#features" class="hover:text-white transition-colors" data-i18n="nav.features">Features</a></li>
+            <li><a href="#showcase" class="hover:text-white transition-colors" data-i18n="nav.showcase">Showcase</a></li>
+            <li><a href="#install" class="hover:text-white transition-colors" data-i18n="nav.install">Installation</a></li>
+            <li><a href="https://github.com/maanfitow/ScienceBatch/releases" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors" data-i18n="footer.releases">Releases &amp; Binaries</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold mb-3" data-i18n="footer.community_title">Community</h4>
+          <ul class="space-y-2 text-xs text-slate-400 font-medium">
+            <li><a href="https://github.com/maanfitow/ScienceBatch" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">GitHub Repository</a></li>
+            <li><a href="https://github.com/maanfitow/ScienceBatch/issues" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors" data-i18n="footer.issues">Report an Issue</a></li>
+            <li><a href="https://github.com/maanfitow/ScienceBatch/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors" data-i18n="footer.license">Apache 2.0 License</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-800/80 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 font-mono gap-3">
+        <div>
+          &copy; 2026 ScienceBatch. Built with Rust, Tauri &amp; TypeScript.
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="https://sciencebatch.com" class="hover:text-slate-400">sciencebatch.com</a>
+          <span>·</span>
+          <a href="https://github.com/maanfitow" target="_blank" rel="noopener noreferrer" class="text-brand-emerald hover:underline" data-i18n="footer.portfolio_link">Developer Portfolio</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl bg-slate-900 border border-brand-emerald text-brand-emerald text-xs font-mono shadow-2xl flex items-center space-x-2 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none">
+    Copied to clipboard!
+  </div>
+
+  <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>
